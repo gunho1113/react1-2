@@ -1,5 +1,126 @@
 # 유건호 202130418
 
+# 4월 3일
+* Props 사용법
+    * JSX에서는 Key-value쌍으로 props를 구성합니다.
+
+    * profile 컴포넌트로 name,introduction,viewCount Props를 전달한다.
+    * jsx에서는 중괄호를 사용하면 js 코드를 넣을 수 있다.
+    * jsx를 사용하지 않는 경우 props의 전달 방법은 createElement()함수를 사용하는 것이다.
+    
+* 컴포넌트 종류
+    * 리액트 초기 버전을 사용할 때는 클래스형 컴포넌트를 주로 사용함
+    * 이후 HOOK이라는 개념이 나오면서 최근에는 함수형 컴포넌트를 주로 사용함.
+    * 예전에 작성된 코드나 문서들이 클래스형 컴포넌트를 사용하고 있기 때문에
+    * 클래스형 컴포넌트와 컴포넌트의 생명주기에 관해서도 공부해둬야 한다.
+* 함수형 컴포넌트
+    * welcome 컴포넌트는 props를 받아, 받은 props중 name키의 값을 "안녕"뒤에 넣어 변환함.
+
+
+* 클래스형 컴포넌트
+    * Welcome컴포넌트는 React.Component로 부터 상속받아 선언함
+
+* 컴포넌트 이름 짓기
+    * 이름은 항상 대문자로 시작
+    * 왜냐하면 리액트는 소문자로 시작하는 컴포넌트를 DOM 태그로 인식하기 때문에
+    * 컴포넌트 파일 이름과 컴포넌트 이름은 같아야함
+
+* 컴포넌트 렌더링
+    * 렌더링의 과정은 다음 코드와 같다.
+
+    ```js
+        function Welcome(props){
+            return <h1>안녕, (props.name)</h1>
+        }
+        const element = <Welcome name = "인제" />
+        ReactDOM.render(
+            element,
+            document.getElementById(`root`)
+        );
+    ```
+* 컴포넌트 합성
+    * 컴포넌트 합성은 여러개의 컴포넌트를 합쳐서 하나의 컴포넌트를 만드는 것
+    * 이랙트에서는 컴포넌트 안에 또 다른 컴포넌트를 사용할 수 있기 때문에, 복잡한 화면을 여러 개의 컴포넌트로 나누어 구현할 수 있다.
+     ```js
+        app.js
+        import logo from './logo.svg';
+        import './App.css';
+
+        import Welcome from './chapter_03/Welcome';
+        import Clock from './chapter_03/Clock';
+
+        function App() {
+        return (
+            <div className="App">
+            <header className="App-header">
+                <img src={logo} className="App-logo" alt="logo"/>
+                <p>
+                Edit <code>src/App.js</code> and save to reload.
+                </p>
+                <a
+                className="App-link"
+                href="https://reactjs.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                >
+                Learn React
+                </a>
+            </header>
+            <Welcome name="홍길동"/>
+            <Welcome name="이순신"/>
+            <Welcome name="강감찬"/>
+            <Clock/>
+            </div>
+        );
+        }
+
+        export default App;
+
+                
+                -----------
+        Welcome.jsx
+
+        export default function Welcome(props){
+            return (
+            <>
+            <h1>안녕, {props.name}</h1>
+            </>
+            )
+
+        }
+
+
+     ```
+* 컴포넌트 추출
+    * 복잡한 컴포넌트를 쪼개서 여러 개의 컴포넌트로 나눌 수 있다.
+    * 큰 컴포넌트에서 일부를 추출해서 새로운 컴포넌트를 만드는 것이다.
+    * 실무에서 처음부터 1개의 컴포넌트에 하나의 기능만 사용하도록 설계하는 것이 좋다.
+
+    * comment는 댓글 표시 컴포넌트다.
+    * 내부에는 이미지, 이름, 댓글과 작성일이 포함되어 있다.
+    
+## state
+* state란?
+    * state는 리액트 컴포넌트의 상태를 의미함
+    * 상태의 의미는 정상인지 비정상인지가 아니라 컴포넌트의 데이터를 의미함
+    * 정확히는 컴포넌트의 변경 가능한 데이터를 의미함
+    * state가 변하면 다시 렌더링이 되기 때문에 렌더링과 관련된 값만 state에 포함시켜야함.
+* state의 특징
+    * 리액트 만의 특별한 형태가 아닌 단지 자바스크립트의 객체일 뿐
+
+    * 함수형 에서는 useState()라는 함수 사용
+    * state는 변경은 가능하지만 직접 수정해서는 안됨
+    * 불가능 하다고 생각하는 것이 좋음
+    * state를 변경하고자 할땐 setstate() 함수를 사용함
+* 생명주기에 대해 알아보기
+    * 생명주기는 컴포넌트의 생성 시점, 사용 시점, 종료 시점을 나타내는 것
+    * constructor가 실행되면서 컴포넌트가 생성됨
+    * 생성 직후 componentDidMount() 함수가 호출됨
+    * 컴포넌트가 소멸하기 전까지 여러 번 렌더링 함.
+    * 렌더링은 props,setState(),forceUpdate()에 의한 상태가 변경되면 이루어짐
+    * 그리고 렌더링이 끝나면 componentDinUpdat() 함수가 호출됨
+    * 마지막으로 컴포넌트가 언마운트 되면 compomentWillUnmount() 함수가 호출됨
+
 # 3월 27일 
 ## JSX 
 * JSX의 역할
@@ -124,7 +245,7 @@
         즉, 한 번 생성된 엘리먼트의 children이나 송성을 바꿀 수 없다.
 
 * 엘리먼트 렌더링하기
-    * 일레먼트를 렌더링 하기 위해 담음과 같은 코드가 필요함
+    * 일레먼트를 렌더링 하기 위해 다음과 같은 코드가 필요함
         ```js
             const element = <h1>안녕 리액트</h1>
             ReactDOM.render(element, document.getElementById('root'));
@@ -165,7 +286,7 @@
 * pure함수 vs Impure 함수
     * pure함수는 인수로 받은 정보가 함수 내부에서도 변하지 않는 함수
     * Impure함수는 인수로 받은 정보가 함수 내부에서 변하는 함수  
-* 리액트 공식 문서에는 컴포넌트의 특징을 담음과 같이 설명함
+* 리액트 공식 문서에는 컴포넌트의 특징을 다음과 같이 설명함
     * 모든 리액트 컴포넌트는 그들의 props에 관해서는 Pure함수 간은 역할을 해야 한다.
     * 다시말해 모든 리액트 컴포넌트는 props를 직접 바꿀 수 없고, 같은 props에 대해서는 항상 같은 결과를 보여준다
 # 3월 20일
