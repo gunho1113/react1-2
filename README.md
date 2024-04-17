@@ -1,5 +1,145 @@
 # 유건호 202130418
 
+# 4월 17일
+
+### 훅(Hook)
+* 클래스 컴포넌트에서 생성자에 state를 정의하고, setState()함수를 통해 state를 업데이트한다
+* 예전에 사용하던 함수형 컴포넌트는 별도로 state를 정의하거나, 컴포넌트의 생명주기에 맞춰서 어떤 코드가 실행되도록 할 수 없다.
+* 함수형 컴포넌트 state나 생명주기 함수의 기능을 사용하게 해주기 위해 추가된 기능이 바로 훅이다
+* 함수형 컴포넌트도 훅을 사용하여 클래스형 컴포넌트의 기능을 모두 동일하게 구현할 수 있게 되었다.
+* hook이란 `state와 생명주기 기능에 갈고리를 걸어 원하는 시점에 정해진 함수를 실행되도록 만든 함수`를 의미한다.
+* 훅의 이름은 모두 `use`로 시작함
+* 사용자 정의 훅(custom hook)을 만둘 수 있으며, 이 경우에 이름은 자유롭게 할 수 있으나 `use`로 시작할 것을 권장함
+
+### useState
+* useState는 함수형 컴포넌트에서 state를 사용하기 위한 훅이다.
+* 다음 예제는 버튼을 클릭할 때마다 카운트가 증가하는 함수형 컴포넌트다.
+* 하지만 증가
+
+```jsx
+import { useState } from "react"
+export default function Counter(props){
+// let count = 0
+    const [count,setCount]= useState(0)
+    return(
+    <>
+    <p>총 {count}</p>
+    <button onClick={()=> setCount(count+1)}>
+            클릭
+    </button>
+        
+    </>
+    )
+}
+```
+
+### useEffect
+* useState와 함께 가장 많이 사용하는 훅
+* 이 함수는 사이트 이팩트를 수행하기 위한 것
+* 영어로 side efect는 부작용(부수적인 작용)을 의미함.
+* 예를 들면 서버에서 데이터를 받아오거나 수동으로 DOM을 변경하는 등의 작업을 의미함
+* 이 작업을 이팩트라고 부르는 이유는 이 작업들이 다른 컴포넌트에 영향을 미칠 수 있으며, 렌더링 중에는 작업을 완료할 수 없기 떄문이다. 렌더링이 끝난 이후 실행되어야 하는 작업들이다.
+* 컴포넌트의 생명주기 함수와 같은 기능을 하나로 통합한 기능을 제공한다.
+
+* useEfect()함수는 다음과 같이 사용한다
+* 첫번째 파라미터는 이팩트 함수가 들어가고, 두 번째 파라미터로는 의존성 배열이 들어간다
+```jsx
+    useEffect(이팩트함수 , 의존성배열)
+```
+* 의존성 배열은 이팩트가 의존하고 있는 배열로, 배열 안에 있는 변수 중에 하나라도 값이 변경되었을 때 이팩트 함수가 실행됨
+* 이팩트 함수는 처음 컴포넌트가 렌더링 된 이후, 그리고 재 렌더링 이후에 실행됨
+* 만약 이팩트 함수가 마운트와 언마운트 될때만 한번씩 실행되게 하고 싶으면 빈 배열을 넣으면 됨
+이 경우 props나 state에 있는 어떤 값에도 의존하지 않기 때문에 여러번 실행되지 않는다.
+
+```jsx
+import { useEffect, useState } from "react"
+
+export default function Counter(props){
+    // let count = 0
+    const [count,setCount]= useState(0)
+
+    useEffect(()=>{
+        document.title = `총 ${count}번 클릭했습니다.`
+    })
+
+    return(
+        <>
+            <p>총 {count}</p>
+            <button onClick={()=> setCount(count+1)}>
+                클릭
+            </button>
+            
+        </>
+    )
+}
+```
+
+### userMemo
+* useMemo() 혹은 Memoized value를 리턴하는 훅
+* 이전 계산값을 갖고 있기 때문에 연산량이 많은 작업의 반복을 피할 수 있다.
+* 이 혹은 렌더링이 얼마나 일어나는 동안 실행된다
+* 따라서 렌더링이 일어나는 동안 실행돼서는 안될 작업을 넣으면 안된다.
+* 예를 들면 useEffect에서 실행되어야 할 사이트 이팩트 같은 것을 말한다.
+------
+* 다음 코드와 같이 의존성 배열을 넣지 않을 경우, 렌더링이 일어날 때마다 매번 함수가 실향됨
+* 따라서 의존성 배열을 넣지 않는 것은 의미가 없다.
+* 만약 빈 배열을 넣게 되면 컴포넌트 마운트 시에만 함수가 실행된다
+```js
+    const memoizedValue = useMemo(
+        () => computeExpensivaValue(a,b)
+    );
+```
+
+### useCallback
+* useCallback()혹은 useMemo()와 유사한 역할을 한다
+* 차이점은 값이 아닌 함수를 반환한다는 점이다.
+* 의존성 배열을 파라미터로 받는것은 useMemo와 비슷함
+### useRef
+* useRef() 혹은 래퍼런스를 사용하기 위한 훅
+* 래퍼런스란 특정 컴포넌트에 접근할 수 있는 객체를 의미함
+```const refContainer = useRef(초깃값);```
+***
+### FocusButton.jsx 
+```js 
+import { useRef } from "react";
+
+export default function FocusButton(props){
+    const inputElem = useRef(null)
+
+    const onButtonClock = () => {
+        inputElem.current.focus()
+    }
+    return(
+        <>
+            <input ref={inputElem} type="text"/>
+            <button onClick={onButtonClock}>Focus th input</button>
+        </>
+    )
+}
+```
+---
+### MeasureEx.jsx
+```js
+    import { useCallback, useState } from "react";
+
+    export default function MeasureEx(props){
+    const[height, setHeight]= useState(0)
+    const measuerRef = useCallback(node => {
+        if(node != null){
+            setHeight(node.getBoundingClientRect().height)
+        
+        
+        }
+    },[])
+    return(
+        <>
+            <h1 ref={measuerRef}>안녕, 리액트</h1>
+            <h2>위 헤더의 높이는 {Math.round(height)}px 입니다.</h2>
+        </>
+    )
+}
+```
+
 # 4월 3일
 * Props 사용법
     * JSX에서는 Key-value쌍으로 props를 구성합니다.
