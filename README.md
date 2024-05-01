@@ -153,6 +153,15 @@ export default function Accommodate(props){
 }
 
 ```
+### 이벤트 처리하기
+- DOM에서 클릭 이벤트를 처리하는 방식 
+```js
+<button onClick="activate()">
+```
+- React에서 클릭 이벤트를 처리하는 방식
+```jsx
+<button onClick={activate}>
+``` 
 # 4월 17일
 npm start
 ### 훅(Hook)
