@@ -1,5 +1,158 @@
 # 유건호 202130418
 
+# 5월 1일
+### 훅의 규칙
+- 무조건 최상위 레벨에서만 호출해야 한다.
+  - 반복묵이나 조건문 또는 중첩된 함수들 안에서 훅을 호출하면 안됨
+  - 이 규칙에 따라서 혹은 컴포넌트가 렌더링 될 때마다 같은 순서로 호출되어야 한다.
+- 함수형 컴포넌트에서만 훅을 호출해야 한다
+  - 그렇기 때문에 자바스크립트 함수에서 훅을 호출하면 안됨
+  - 훅은 함수형 컴포넌트 혹은 직접 만든 커스텀 훅에서만 호출 가능함
+
+
+#### 커스텀 훅
+- userStatus를 이용해 온라인인지 아닌지를 나타내는 코드
+```jsx userStatus.jsx
+    import { useEffect,useState } from "react"
+
+    export default function UserStatus(props){
+        const [isOnline, setIsOnline] = useState(null)
+
+        useEffect(()=>{
+            function handleStatusChange(status){
+                setIsOnline(status.isOnline)
+            }
+            serverAPI.subscribeUserStatus(props.user.id,handleStatusChange)
+            return () => {
+                serverAPI.unsubscribeUserStatus(props.user.id,handleStatusChange)
+            }
+        })
+        if(isOnline === null){
+            return '대기중...'
+        }
+        return isOnline?'온라인':'오프라인'
+    }
+
+```
+- 온라인이면 이름을 초록색 오프라인이면 검은색으로 나타내는 코드
+```jsx  UserListItem.jsx
+    import { useEffect,useState } from "react"
+
+    export default function UserListItem (props){
+        const [isOnline, setIsOnline] = useState(null)
+
+        useEffect(()=>{
+            function handleStatusChange(status){
+                setIsOnline(status.isOnline)
+            }
+            serverAPI.subscribeUserStatus(props.user.id,handleStatusChange)
+            return () => {
+                serverAPI.unsubscribeUserStatus(props.user.id,handleStatusChange)
+            }
+        })
+    
+        return (
+            <li style={{ color: isOnline ? 'green' : 'black'}}>
+                {props.user.name}
+            </li>
+        )
+    }
+```  
+- use로 시작하는 훅을 만들고 내부에서 다른 훅을 호출하면됨
+
+```jsx UserStatus.jsx
+import { useEffect,useState } from "react"
+import useUserStatus from "./useUserStatus"
+
+export default function UserStatus(props){
+    const isOnline=useUserStatus[props.user.id]
+
+   
+    if(isOnline === null){
+        return '대기중...'
+    }
+    return isOnline?'온라인':'오프라인'
+}
+```
+```jsx useUserStatus.jsx
+    import { useEffect,useState } from "react"
+
+    export default function useUserStatus(userId){
+        const [isOnline, setIsOnline] = useState(null)
+
+        useEffect(()=>{
+            function handleStatusChange(status){
+                setIsOnline(status.isOnline)
+            }
+            serverAPI.subscribeUserStatus(userId,handleStatusChange)
+            return () => {
+                serverAPI.unsubscribeUserStatus(userId,handleStatusChange)
+            }
+        })
+
+    }
+```
+```jsx UserListItem.jsx
+    import { useEffect,useState } from "react"
+    import useUserStatus from "./useUserStatus"
+
+    export default function UserListItem (props){
+        const isOnline = useUserStatus(props.user.id)
+
+    
+        return (
+            <li style={{ color: isOnline ? 'green' : 'black'}}>
+                {props.user.name}
+            </li>
+        )
+    }
+
+```
+```jsx useCounter.jsx 
+    import { useState } from "react";
+
+    export default function (initialValue){
+        const [count,setCount] = useState(initialValue)
+
+        const increaseCount = () => setCount((count) => count + 1)
+        const decreaseCount = () => setCount((count) => Math.max(count-1,0))
+
+        return [count,increaseCount,decreaseCount]
+
+    }
+
+```
+```jsx Accommodate.jsx
+import { useState,useEffect } from "react";
+import useCounter from "./useCounter";
+
+const MAX_CAPACITY = 10
+
+export default function Accommodate(props){
+    const [isFull,setIsFull] = useState(false)
+    const [count,increaseCount,decreaseCount] = useCounter(0)
+    
+    useEffect(()=>{
+        console.log("======================")
+        console.log("useEffect() is called.")
+        console.log(`isFull: ${isFull}`)
+    })
+
+    useEffect(() =>{
+        setIsFull(count >= MAX_CAPACITY)
+        console.log(`Current count value ${count}`)
+    },[count])
+    return(
+        <div>
+            <p>{`총 ${count}명 수용했습니다`}</p>
+            <button onClick={increaseCount} disabled={isFull}>입장</button>
+            <button onClick={decreaseCount}>퇴장</button>
+            {isFull && <p style={{color:'red'}}>정원이 가득 찼습니다.</p>}
+        </div>
+    )
+}
+
+```
 # 4월 17일
 npm start
 ### 훅(Hook)
