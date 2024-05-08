@@ -1,5 +1,191 @@
 # 유건호 202130418
 
+
+# 5월 8일
+### 이벤트
+```js
+    import { useState } from "react"
+
+export default function Toggle(props){
+    const [isToggleOn,setIsToggleOn] = useState(true)
+
+    const handleClick = () =>{
+        setIsToggleOn ((isToggleOn) => !isToggleOn)
+    } 
+
+    return(
+        <button onClick={handleClick}>
+            {isToggleOn ? '커짐':'꺼짐'}
+        </button>
+    )
+}
+```
+### Arguments 전달하기
+- 함수를 정의할 때는 파라미터 혹은 매개변수, 함수를 사용할때는 아귀먼트 혹은 인수라고 부른다
+- 이벤트 핸들러에 매개변수를 전달해야 하는 경우도 많다.
+
+- 260 page
+
+```jsx
+    export default function MyButton(props){
+        const handleClickDelete = (id,e) => {
+         console.log(id,e.target)
+        }
+        return(
+            <button onClick = {(e) => handleClickDelete(1,e)}>삭제하기</button>
+        )
+    }
+```
+### 조건부 렌더링
+- 렌더링해야 될 컴포넌트를 변수처럼 사용하는 방법이 엘리먼트 변수다.
+- 277~278 page
+```js LoginControl.jsx
+    import { useState } from "react";
+    import Greeting from "./Greeting";
+
+    export default function LoginControl(props){
+        const [isLoggedIn,setIsLoggedIn] = useState(false)
+
+        const handleLoginClick = () => {setIsLoggedIn(true)}
+
+        const handleLogoutClick = () => {setIsLoggedIn(false)}
+
+        //엘리먼트 변수
+        let button;
+        if(isLoggedIn){
+            button = <LogoutButton onClick={handleLogoutClick}/>
+        }else{
+            button = <LoginButton onClick={handleLoginClick}/>
+        }
+        return(
+            <>
+                <Greeting isLoggedIn={isLoggedIn}/>
+                {button}
+            </>
+        )
+    }
+
+    function LoginButton(props){
+        return(
+            <button onClick={props.onClick}>로그인</button>
+        )
+    }
+    function LogoutButton(props){
+        return(
+            <button onClick={props.onClick}>로그아웃</button>
+        )
+    }
+
+```
+
+```js Greeting.jsx
+    export default function Greeting(props){
+    if(props.isLoggedIn){
+        return <p>안녕하세요. 반갑습니다.</p>
+    }else{
+        return <p>로그인 하세요!</p>
+    }
+}
+```
+
+
+### 인라인 조건
+- 인라인 if
+    - if문을 직접 사용하지 않고 , 동일한 효과를 내기 위해 && 논리 연산자를 사용함
+    - && 는 and연자로 모든 조건이 참일때만 참이 된다.
+    - 첫 조건이 거짓이면 두번째 조건은 판단할 필요가 없다. 단축평가
+    - 판단하지않고 그대로 결과값을 리턴함
+
+- 인라인 if - else
+    - 상향 연산자를 사용함 조건식? 참일 경우 : 거짓일 경우
+    - 문자열이나 엘리먼트를 넣어 사용할 수도 있다.
+### 컴포넌트 렌더링 막기
+- 컴포넌트를 렌더링하고 싶지 않으때 null을 리턴한다.
+``` js
+    function WarningBanner(props){
+        if(!props.warning){
+            return null;
+        }
+        return(
+            <div>경고</div>
+        )
+    }
+```
+
+```js MainPage.jsx
+    import { useState } from "react"
+import WarningBanner from "./WarningBanner"
+export default function MainPage(props){
+    const [showWarning,setShowWarning] = useState(false)
+
+    const handleToggleClick = () => {
+        setShowWarning(prevShowWarning => !prevShowWarning)
+
+    }
+
+    return(
+        <>
+            <WarningBanner warning = {showWarning}/>
+            <button onClick={handleToggleClick}>
+                {showWarning ? '감추기' : '보이기'}
+            </button>
+        </>
+    )
+}
+```
+``` js WarningBanner.jsx
+export default function WarningBanner(props){
+    if(!props.warning){
+        return null
+    }
+    return(
+        <div>경고!</div>
+    )
+} 
+```
+
+```js Toolbar.jsx
+import LandingPage from "./LandingPage"
+export default function Toolbar(props){
+    const {isLoggedIn,onClickLogin,onClickLogout} = props
+
+    return(
+        <div>
+            {isLoggedIn && <span>환영합니다.</span>}
+            {isLoggedIn
+                ? <button onClick={onClickLogout}>로그아웃</button>
+                : <button onClick={onClickLogin}>로그인</button>
+                 
+            }
+        </div>
+    )
+}
+```
+
+```js LandingPage.jsx
+import { useState } from "react";
+import Toolbar from "./Toolbar";
+export default function LandingPage(props){
+    const [isLoggedIn,setIsLoggedIn] = useState(false)
+
+    const onClickLogin = () => {
+        setIsLoggedIn(true)
+    }
+    const onClickLogout = () => {
+        setIsLoggedIn(false)
+    }
+    return(
+        <div>
+            <Toolbar
+            isLoggedIn = {isLoggedIn}
+            onClickLogin = {onClickLogin}
+            onClickLogout = {onClickLogout}
+            />
+            <div>소풀과 함께하는 리액트 공부!</div>
+        </div>
+    )
+}
+```
 # 5월 1일
 ### 훅의 규칙
 - 무조건 최상위 레벨에서만 호출해야 한다.
