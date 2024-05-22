@@ -1,6 +1,128 @@
 # 유건호 202130418
 
+# 5월 22일
+### 리스트와 키
+- 리스트는 자바스크립트의 변수나 객체를 하나의 변수로 묶어놓은 것
 
+- map() 2를 곱한 후 doubled라는 배열에 다시 넣는 코드
+``` js
+const doubled = numbers.map((number)=> number*2)
+```
+
+```js numberList.jsx
+export default function NumberList(){
+    const numbers = [1,2,3,4,5]
+
+    const todos = [
+        {id: 1, name:"홍길동1"},
+        {id: 2, name:"홍길동2"},
+        {id: 3, name:"홍길동3"},
+        {id: 4, name:"홍길동4"},
+        {id: 5, name:"홍길동5"},
+    ]
+    const listItems = numbers.map((numbers)=>
+        <li key={numbers.toString()}>{numbers}</li>
+    )
+    const todoItems = todos.map((todo)=>
+        <li key={todo.id}>{todo.name}</li>
+    )
+    const indexItems =  todos.map((todo,index)=>
+        <li key={index}>{todo.name}</li>
+    )
+    return(
+        <>
+            <ul>{listItems}</ul>
+            <ul>{todoItems}</ul>
+            <ul>{indexItems}</ul>
+        </>
+    )
+}
+
+```
+- 키 : 리스트에서 아이템을 구별하기 위한 고유한 문자열
+- 이 키는 리스트에서 어떤 아이템 변경,추가 또는 제거되었는지 구분하기 위해 사용함
+- 키는 같은 리스트에 있는 엘리먼트 사이에서만 고유한 값이면 된다.
+
+### 폼
+- 폼은 일반적으로 사용자로부터 입력을 받기위한 양식에서 많이 사용됨
+### 제어 컴포넌트
+- 제어 컴포넌트는 사용자가 입력한 값에 접근하고 제어할 수 있도록 해주는 컴포넌트다
+
+```js NameForm.jsx
+import { useState } from "react";
+
+export default function NameForm(){
+    const [value,setValue] = useState('')
+    
+    const handleChange = (e) => {setValue(e.target.value)}
+    const handleSubmit = (e) => {alert('입력한 이름: '+value)
+    e.preventDefault()
+}
+return(
+    <form onSubmit={handleSubmit}>
+        <label>
+            이름:
+            <input type="text" value={value} onChange={handleChange}/>
+            <button type="submit">제출</button>
+        </label>
+    </form>
+)
+}
+```
+- textarea : 텍스트박스 안 글씨
+```js RequestForm.jsx
+import { useState } from "react";
+
+export default function RequestForm(){
+    const [value,setValue] = useState('요청사항을 입력하세요.')
+
+    const handleChange = (e) => {setValue(e.target.value)}
+    const handleSubmit = (e) => {alert('요청사항: '+value)
+        e.preventDefault()
+    }
+    return(
+        <form onSubmit={handleSubmit}>
+            <label>
+                요청사항:
+                <textarea value={value} onChange={handleChange}/>
+                <button type="submit">제출</button>
+            </label>
+        </form>
+    )
+}
+
+```
+```js RequestForm.jsx(select)
+import { useState } from "react";
+
+export default function RequestForm(){
+    const [value,setValue] = useState('요청사항을 입력하세요.')
+
+    const handleChange = (e) => {setValue(e.target.value)}
+    const handleSubmit = (e) => {alert('요청사항: '+value)
+        e.preventDefault()
+    }
+    return(
+        <form onSubmit={handleSubmit}>
+            <label>
+                요청사항:
+                <select value={value} onChange={handleChange}>
+                    <option value = "사과">사과</option>
+                    <option value = "바나나">바나나</option>
+                    <option value = "오렌지">오렌지</option>
+                </select>
+                <input type="file"/>
+                <button type="submit">제출</button>
+                
+            </label>
+
+        </form>
+    )
+}
+
+```
+- select 태그도 textarea와 동일함
+- file input 태그는 그 값이 읽기 전용이기 떄문에 리액트에서는 비제어 컴포넌트가 된다.
 # 5월 8일
 ### 이벤트
 ```js
