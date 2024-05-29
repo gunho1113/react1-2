@@ -1,5 +1,115 @@
 # 유건호 202130418
 
+# 5월 29일
+### File input 태그
+- file input태그는 그 값이 읽기 전용이기 때문에 리액트에서는 비제어 컴포넌트다<br>
+ ```js
+    <input type="file"> 
+```
+- input Null Value
+    - 제어 컴포넌트에 value prop을 정해진 값으로 넣으면 코드를 수정하지 않는 한 입력값을 바꿀 수 없다.
+    - 만약 value prop은 넣되 자유롭게 입력할 수 있게 만들고 싶다면 같이 undefined 또는 null을 넣어주면 된다.
+    ```js
+        setTimeout(function(){
+            ReactDOM.render(<input value={null}/>,rootNode);},1000);
+    ```
+
+```js SignUp.jsx
+import { useState } from "react";
+
+export default function SignUp(){
+    const [name,setName] = useState()
+    const [gender,setGender] = useState('남자')
+    const [document,setDocument] = useState()
+    const [haveBreakfast,sethaveBreakfast] = useState(true)
+    const handleChangeName = (e) => {
+        setName(e.target.value)
+    }
+    const handleChangeGender = (e) => {
+        setGender(e.target.value)
+    }
+    const handleChangeDocument = (e) => {
+        setDocument(e.target.value)
+    }
+    const handleChangeHaveBreakfast = (e) =>{
+        sethaveBreakfast(e.target.value)
+    }
+    const handleSubmit = (e) =>{
+        alert(`이름: ${name}, 성별: ${gender}, 문서: ${document}, 아침식사: ${haveBreakfast}`)
+        e.preventDefault()
+    }
+
+    return(
+        <form onSubmit={handleSubmit}>
+            <label>
+                이름: 
+                <input type="text" value={name} onChange={handleChangeName} placeholder="이름을 입력해 주세요." />
+                
+            </label>
+            <label>
+                성별:
+                <select value={gender} onChange={handleChangeGender}>
+                    <option value="남자">남자</option>
+                    <option value="여자">여자</option>
+                </select>
+            </label>
+            <br/>
+            <label>
+                도큐먼트:
+                <textarea value={document} onChange={handleChangeDocument}></textarea>
+            </label>
+            <label>
+                아침식사:
+                <input type="checkbox" checked={haveBreakfast} onChange={handleChangeHaveBreakfast}></input>
+            </label>
+            <button type="submit">제출</button>
+        </form>
+    )
+}
+```
+
+```js boiliVerdict.jsx
+    export default function BoilingVerdict(props){
+    if(props.celsius >=100){
+        return <p>물이 끓습니다.</p>
+    }
+    return <p>물이 끓지 않습니다.</p>
+}
+--------------------------------------------
+export default function BoilingVerdict(props){
+    if(props.celsius >=100){
+        return <p>물이 끓습니다.</p>
+    }
+    else if(props.foo <=0){
+    return <p>물이 끓지 않습니다.</p>
+    }
+}
+```
+```js App.js
+    function App() {
+        return (
+
+            <>
+                <BoilingVerdict celsius="99"/> //결과값: 물이 끓지 않습니다.
+            </>
+        );
+    }
+
+    export default App;
+    ----------------------
+    function App() {
+        return (
+
+            <>
+                <BoilingVerdict celsius="100"/> //결과값: 물이 끓습니다.
+            </>
+        );
+    }
+
+    export default App;
+```
+---
+
 # 5월 22일
 ### 리스트와 키
 - 리스트는 자바스크립트의 변수나 객체를 하나의 변수로 묶어놓은 것
