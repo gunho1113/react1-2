@@ -1,5 +1,217 @@
 # 유건호 202130418
 
+# 6월 5일
+### shared state
+- shared state는 state의 공유를 의미함
+- 같은 부모 컴포넌트의 state를 자식 컴포넌트가 공유해서 사용하는 것
+
+```js Calculator.jsx
+import TempratureInput from "./TempratureInput";
+
+export default function Calculator(){
+  
+    return(
+        <>
+        <TempratureInput scale='c' d/>
+            <TempratureInput scale='f' d/>
+        </>
+    )
+}
+
+```
+```js TempratureInput.jsx
+import { useState } from "react"
+
+export default function TempratureInput(props){
+    const scaleNames = {
+        c: '섭씨',
+        f: '화씨'
+    }
+    const [temperature, setTemperature] = useState()
+    const handleChange = (e) =>{
+        setTemperature(e.target.value)
+    }
+    return(
+        <fieldset>
+            <legend>섭씨온도를 입력해 주세요 (단위:{scaleNames[props.scale]}) :</legend>
+            <input value={temperature} onChange={handleChange} />
+        </fieldset>
+    )
+}
+
+```
+- 하위 컴포넌트의 state를 부모 컴포넌트에 올려서 shared state를 적용 시키는것을 lifting State Up 이라고 한다.
+- temperatureInput 컴포넌트에서 온도 값을 가죠오는 부분을 다음과 같이 수정함
+(state를 사용하지 않고 props를 가져올수있다)
+```js
+    //변경전 < <input value={temperature} onChange={handleChange} />>
+    <input value = {props.temprature} onChange={change}>
+```
+```js
+// const [temperature, setTemperature] = useState() <- 지울 수 있음
+const handleChange = (e) =>{
+        
+        // 변경전: setTemperature(e.target.value)
+        props.onTemperatureChange(e.target.value)
+    }
+```
+```js Calculator.jsx
+import { useState } from "react";
+import TempratureInput from "./TempratureInput";
+import BoilingVerdict from "./BoilingVerdict";
+
+export default function Calculator(){
+  
+    const [temperature,setTemperature] = useState()
+    
+    const [scale,setScale] = useState('c')
+
+    const handleCelsiusChange = (temperature) =>{
+        setTemperature(temperature)
+        setScale('c')
+    }
+    const handleFahrenheitChange = (temperature) =>{
+        setTemperature(temperature)
+        setScale('f')
+    }
+    const celsius = (scale === 'f' ? tryConvert(temperature,toCelsius) : temperature)
+
+    const fahrenheit = (scale === 'c' ? tryConvert(temperature,toCelsius) : temperature)
+
+    return(
+        <>
+            <TempratureInput scale='c' temperature={celsius} onTemperatureChange={handleCelsiusChange}/>
+            <TempratureInput scale='f' temperature={fahrenheit} onTemperatureChange={handleFahrenheitChange}/>
+            <BoilingVerdict celsius={parseFloat(celsius)}/>
+        </>
+    )
+}
+function toCelsius(fahrenheit){
+    return (
+        (fahrenheit-32) * 5/9
+    )
+}
+function toFahrenheit(celsius){
+    return (
+        (celsius * 9/5)+32
+    )
+}
+
+function tryConvert(temperature,convert){
+    const input = parseFloat(temperature)
+    if(Number.isNaN(input)){
+        return('')
+    }
+    const output = convert(input)
+    const rounded = Math.round(output*1000)/1000
+    return(rounded.toString())
+}
+```
+```js BoilingVerdict.jsx
+export default function BoilingVerdict(props){
+    if(props.celsius >=100){
+        return <p>물이 끓습니다.</p>
+    }
+    else if(props.foo <=0){
+    return <p>물이 끓지 않습니다.</p>
+    }
+}
+
+```
+```js TempratureInput.jsx
+import { useState } from "react"
+
+export default function TempratureInput(props){
+    const scaleNames = {
+        c: '섭씨',
+        f: '화씨'
+    }
+    // const [temperature, setTemperature] = useState()
+    const handleChange = (e) =>{
+        
+        // setTemperature(e.target.value)
+        props.onTemperatureChange(e.target.value)
+    }
+    return(
+        <fieldset>
+            <legend>섭씨온도를 입력해 주세요 (단위:{scaleNames[props.scale]}) :</legend>
+            {/* <input value={temperature} onChange={handleChange} /> */}
+            <input value = {props.temprature} onChange={handleChange}/>
+        </fieldset>
+    )
+}
+```
+- 상위 컴포넌트인 Calculator에서 온도와 단위를 state로 갖고 두개의 하위 컴포넌트는 각각 섭씨와 화씨로 변환된 온도와 단위, 그리고 온도를 업데이트 하기 위한 함수를 props로 갖고 있다.
+ 이렇게 모든 컴포넌트가 state를 갖지않고 상위 컴포넌트로 올려서 공유하면 더욱 간결하고 효율적이게 개발할 수 있다.
+
+# Composition(합성)
+- 여러 개의 컴포넌트를 합쳐서 새로운 컴포넌트를 만드는것을 합성이라 한다
+## Containment
+- 특정 컴포넌트가 하위 컴포넌트를 포함하는 형태의 합성 방법
+- 컴포넌트에 따라서 어떤 자식 엘리먼트가 들어올 지 미리 예상할 수 없는 경우가 많다.
+- 범용적인 박스 역할을 하는 sidebar 혹은 dialog와 같은 컴포넌트에서 특히 자주 볼 수 있다.
+- 이런 컴포넌트에서는 children prop을 사용하여 자식 엘리먼트를 출력에 그대로 전달하는것이 좋다
+- 이때 children prop은 컴포넌트의 props에 기본적으로 들어있는 children 속성을 사용함.
+
+- 리액트에서는 props.children을 통해 하위 컴포넌트를 하나로 모아서 제공해준다
+- 만일 여러 개의 children 집합이 필요할 경우 별도로 props를 정의해서 각각 원하는 컴포넌트를 넣어준다.
+
+```js WelcomeDialog.jsx
+import FancyBorder from "./FancyBorder";
+
+export default function WelcomeDialog(){
+    return(
+        <FancyBorder color='blue'>
+            <h1 className="Dialog-title">어서오세요.</h1>
+            <p className="Dialog-message">우리 사이트 방문을 환영합니다.</p>
+        </FancyBorder>
+    )
+}
+```
+```js FancyBorder.jsx
+export default function FancyBorder(props){
+    return(
+        <div className={'FancyBorder' + props.color}>
+            {props.children}
+        </div>
+    )
+}
+```
+```js SplitPane.jsx
+export default function SplitPane(props){
+    return(
+        <div>
+            <div>
+                {props.left}
+            </div>
+            
+            <div>
+                {props.right}
+            </div>
+        </div>
+    )
+}
+```
+## Specialization(특수화 ,전문화)
+- 웰컴다이얼로그는 다이얼로그의 특별한 케이스다
+- 범용적인 개념을 구별이 되게 구체화하는것을 특수화라고 한다
+- 객체지향 언어에서는 상속을 사용하여 특수화를 구현한다
+- 리액트에서는 합성을 사용하여 특수화를 구현한다
+- 다음 예와 같이 특수화는 범용적으로 쓸 수 있는 컴포넌트를 만들어 놓고 이를 특수한 목적으로 사용하는 합성방식이다.
+
+```js Dialog.jsx
+import FancyBorder from "./FancyBorder";
+
+export default function Dialog(props){
+    return(
+        <FancyBorder color='blue'>
+        <h1>{props.title}</h1>
+        <p>{props.message}</p>
+        </FancyBorder> 
+    )
+}
+```
+
 # 5월 29일
 ### File input 태그
 - file input태그는 그 값이 읽기 전용이기 때문에 리액트에서는 비제어 컴포넌트다<br>
@@ -9,10 +221,10 @@
 - input Null Value
     - 제어 컴포넌트에 value prop을 정해진 값으로 넣으면 코드를 수정하지 않는 한 입력값을 바꿀 수 없다.
     - 만약 value prop은 넣되 자유롭게 입력할 수 있게 만들고 싶다면 같이 undefined 또는 null을 넣어주면 된다.
-    ```js
-        setTimeout(function(){
-            ReactDOM.render(<input value={null}/>,rootNode);},1000);
-    ```
+```js
+setTimeout(function(){
+    ReactDOM.render(<input value={null}/>,rootNode);},1000);
+```
 
 ```js SignUp.jsx
 import { useState } from "react";
