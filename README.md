@@ -1,5 +1,171 @@
 # 유건호 202130418
 
+# 6월 11일
+### Containment와 specialzation을 같이 사용하기
+- Containment를 위해서 props.children을 사용하고 , specialzation을 위해 직접 정의한 props를 사용하면 된다.
+- Dialog컴포넌트는 이전의 것과 비슷한데 containment를 위해 끝 부분에 props.children을 추가 했다
+- Dialog를 사용하는 signUpDialog는 Specailization을 위해 props인 title,message에 값을 넣어주고 있고, 입력을 받기위해 input과 button을 사용한다
+이 두 개의 태그는 모두 props.children으로 전달되어 다이얼로그에 표시된다
+
+### 상속(inheritance)
+- 합성과 대비되는 개념으로 상속이 있다
+- 자식 클래스는 부모 클래스가 가진 변수나 함수 등의 속성을 모두 갖게 되는 개념이다
+- 하지만 리액트에서는 상속보다는 합성을 통해 새로운 컴포넌트를 생성함
+
+```jsx Card.jsx
+export default function Card(props){
+    
+    const {title,backgroundColor,children} = props
+    
+    return(
+        <div style={{backgroundColor: backgroundColor || 'white'}}>
+            {title && <h1>{title}</h1>}
+            {children}
+        </div>
+    )
+}
+```
+```jsx ProfileCard.jsx
+import Card from "./Card";
+
+export default function ProfileCard(){
+    return(
+        <Card title="inje Lee" backgroundColor = "#4ea04e"/>
+    )
+}
+```
+![alt text](image.png)
+### 컨텍스트(context)
+- 기존의 일반적인 리액트에서는 데이터가 컴포넌트의 props를 통해 부모에서 자식으로 단방향으로 전달되었음
+- 컨텍스느는 리액트 컴포넌트 사이에서 데이터를 기존의 props를 통해 전달하는 방식 대신 '컴포넌트 트리를 통해 곧바로 컴포넌트에 전달하는 새로운 방식'을 제공함
+- 컨텍스트를 사용하면 일일이 props로 전달할 필요 없이 데이터를 필요로 하는 컴포넌트에 곧바로 데이터를 볼 수 있다. 
+
+---
+### 언제 컨텍스트를 사용할까
+- 여러 컴포넌트에서 자주 필요로 하는 데이터는 로그인 여부, 로그인 정보, UI테마, 현재 선택된 언어 들이 있다.
+- props를 통해 데이터를 전달하는 기존 방식은 실제 데이터를 필요로 하는 컴포넌트까지의 깊이가 깊어질 수록 복잡해짐
+- 반복적인 코드를 계속해서 작성해 주어야 하기 때문에 비효율적이고 가독성이 떨어진다. 이때 컨텍스트를 사용하면 이러한 방식을 깔끔하게 개선가능하다.
+---
+### 컨텍스트를 사용하기 전에 고려할 점
+- 컨텍스트는 다른 레벨의 많은 컴포넌트가 특정 데이터를 필요로 하는 경우에 주로 사용함
+- 하지만 무조건 컨텍스트를 사용하는것이 좋은것은 아님 왜냐하면 컴포넌트와 컨텍스트가 연동되면 재 사용성이 떨어지기 떄문이다
+- 따라서 다른 레벨의 많은 컴포넌트가 데이터를 필요로 하는 경우가 아니면 props를 통해 데이터를 전달하는 컴포넌트 합성 방벙이 더 적절하다
+---
+```jsx ContextTest.jsx
+const ThemeContext = React.createContext('light')
+
+function App(){
+    return(
+        <ThemeContext.Provider value='dark'>
+            <Toolbar/>    
+        </ThemeContext.Provider>
+    )
+}
+
+function Toolbar(){
+    return(
+        <div>
+            <ThemeButton />
+        </div>
+    )
+}
+function ThemeButton(){
+    return(
+        <ThemeContext.Consumer>
+            {value => <button theme={value}/>}
+        </ThemeContext.Consumer>
+    )
+}
+```
+### 컨텍스트 api
+1. React.createContext
+    - 컨텍스트를 생성하기 위한 함수
+    - 파라미터에는 기본값을 넣어주면됨
+    - 하위 컴포넌트는 가장 가까운 상위 레벨의 provider로 부터 컨텍스트를 받게 되지만, 만일 Provider를 찾을 수 없다면 설정한 기본값을 사용한다
+2. context.Privider
+    - context 컴포넌트로 하위 컴포넌트들을 감싸주면 모든 하위 컴포넌트들이 해당 컨텍스트의 데이터에 접근할 수 있게 된다.
+    ```jsx
+    <MyContext.Provider value={~~~~}>
+    ```
+    - Provider 컴포넌트에는 value라는 prop이 있고, 이것은 provider 컴포넌트 하위에 있는 컴포넌트에게 전달된다.
+    - 하위 컴포넌트를 consumer 컴포넌트라고 부른다
+3. Class.contextType
+    - Provider 하위에 있는 클래스 컴포넌트에서 컨텍스트의 데이터에 접근하기 위해 사용함
+    - Class 컴포넌트는 더 이상 사용하지 않으므로 참고만한다
+4. Context.Consumer
+    - 함수형 컴포넌트에서 Context Consumer를 사용하여 컨텍스트를 구독할 수 있다.
+
+    - 컴포넌트의 자식으로 함수가 올 수 있는데 이것을 function as a child라고 부른다.
+    - context Consumer로 감싸주면 자식으로 들어간 함수가 현재 컨텍스트의 value를 받아서 리액트 노드로 리턴한다
+    - 함수로 전달되는 value는 Provider의 value props와 동일하다
+
+5. Context.displayName
+    - 컨텍스트 객체는 displayName이라는 문자열 속성을 갖는다.
+    - 크롬의 리액트 개발자 도구에서는 컨텍스트의 Provider나 Consumer를 표시할때 displayName을 함께 표시해준다
+---    
+### 여러개의 컨텍스트 사용하기
+- 여러 개의 컨텍스트를 동시에 사용하려면 Context.Provider를 중첩해서 사용함
+- 여러 개의 컨텍스트를 동시에 사용할 수 있다
+- 하지만 두 개 또는 그 이상의 컨텍스트 값이 자주 함께 사용될 경우 모든 값을 한번에 제공해 주는 별도의 render Prop 컴포넌트를 직접 만드는것을 고려하는 것이 좋다.
+---
+### userContext
+- 함수형 컴포넌트에서 컨텍스트를 사용하기 위해 컴포넌트를 매번 Consumer 컴포넌트로 감싸주는 것보다 더 좋은 방법이 있다. 바로 Hook이다
+- useContext() 혹은 React.createContext() 함수 호출로 생성된 컨텍스트 객체를 인자로 받아서 현재 컨텍스트의 값을 리턴한다
+
+- useContext() 혹을 사용할 때에는 파라미터로 컨텍스트 객체를 넣어줘야 한다
+
+```jsx ThemeContext.jsx
+const ThemeContext = React.createContext()
+ThemeContext.displayName = 'ThemeContext'
+
+
+export default ThemeContext
+```
+
+```jsx MainContant.jsx
+import { useContext } from "react";
+import {ThemeContext} from "styled-components";
+
+export default function MainContant(){
+    const {theme,toggleTheme} = useContext(ThemeContext)
+
+    return(
+        <div style={{
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: theme == 'light' ? 'white' : 'black',
+            color: theme == 'light' ? 'black' : 'white'
+        }}>
+            <p>안녕하세요.</p>
+            <button onClick={toggleTheme}>테마 변경</button>
+        </div>
+    )
+}
+```
+```jsx DarkOrLight.jsx
+import { useCallback, useState } from "react";
+import MainContant from "./MainContant";
+import {ThemeContext} from "styled-components";
+
+export default function DarkOrLight(){
+    const {theme, setTheme} = useState('light')
+
+    const toggleTheme = useCallback(()=>{
+        if(theme == 'light'){
+            setTheme('dark')
+        }else if(theme == 'dark'){
+            setTheme('light')
+        }
+    },[theme])
+    return(
+        <ThemeContext.Provider value={{theme,toggleTheme}}>
+            <MainContant />
+        </ThemeContext.Provider>
+    )
+}
+
+
+```
 # 6월 5일
 ### shared state
 - shared state는 state의 공유를 의미함
