@@ -1,5 +1,141 @@
 # 유건호 202130418
 
+# 6월 12일
+### CSS
+- csss는 cascading style Sheets의 약자로 스타일링을 위한 언어다
+- cascading이란 계단식이라는 뜻으로 한 엘리먼트에 여러 스타일이 적용될 경우 스타일간의 충돌을 막기 위해 계단식으로 스타일을 적용시키는 규칙을 갖고 있다.
+
+- 즉 하나의 스타일이 여러개의 엘리먼트에 적용될 수도 있고, 하나의 엘리먼트에도 여러개의 스타일이 적용될 수도있다.
+- 엘리먼트에 스타일이 적용되는 규칙을 selector(선택자) 라고 한다.
+css는 이 선택자와 스타일로 이루어진다.
+### css문법과 선택자
+- 선택자를 먼저 쓰고 다음에 적용할 스타일을 중괄호 안에 세미클론으로 구분하여 한씩 작성한다.
+- 스타일은 property(속성)과 key value(키 값)으로 이루어 지며, 이들은 콜론으로 `:` 구분하고 , 각 스타일은 세미콜론 `;` 으로 구분한다
+### 레이아웃과 관련된 속성
+- 화면에 엘리먼트를 어떻게 배치할 것인지를 정의한다
+- 가장 중요한 속성은 display다
+- 모든 엘리먼트는 기본 display 속성을 갖고 있지만 이 기본값을 변경해 줄 수 있다
+- none는 존재는 하지만 화면에 보이지 않은 것으로, js를 넣을때 많이 사용함
+- block은 세로로 정렬되며, with의 height를 갖을 수 있다. 크기와 상관없이 한 줄에 점유한다.
+- inline은 가로로 정렬되며, with의 height를 갖을 수 없다. 켄텐츠의 크기만큼 공간을 점유한다.
+- inline-block는 기본적으로 inline의 특성을 갖지만, with와 height등 block의 특성을 사용할 수 있다.
+
+`MOZILA 참고`
+
+- visibilty 속성은 엘리먼트의 가시성을 정의한다
+- 여기서 중요한건 display:none과 visibility:hidden의 차이다
+- display:none은 엘리먼트의 영역으로 보이지않고 visibility:hidden은 보인다
+- position속성은  엘리먼트 위치를 어떻게 할것인지 정한다
+
+- font-size등 크기를 나타내는 단위로는 px,em,rem,xm이있다
+- 1em = 16px 실제로 em과 rem을 많이쓴다.(반응형 때문에)
+
+### styled-components
+- css문법을 그대로 사용하면서 결과물을 스타일링된 컴포넌트 형태로 만들어 주는 오픈소스 라이브러리
+
+----
+1. styled-components설치하기
+    - npm install --save styled-components
+
+2. styled-components 기본 사용법
+    - 태그드 템플릿 리터럴을 사용하여 구성 요소의 스타일을 지정한다
+    - 태그드 템플릿 리터럴은 자바스크립트에서 제공하는 문법중 하나로 리럴을 템플릿 형태로 사용하는 것이다
+    
+``` jsx MainPage.jsx
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+    padding: 1em;
+    background: grey`
+
+const Title = styled.h1`
+    font-size: 1.5em;
+    color: white;
+    text-align:center;`
+
+export default function MainPage(){
+    return(
+        <Wrapper>
+            <Title>
+                안녕 리액트
+            </Title>
+        </Wrapper>
+    )
+}
+```
+
+![alt text](image-1.png)
+
+```js 
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+    padding: 1em;
+    background: gray`
+
+const Title = styled.h1`
+    font-size: 1.5em;
+    color: white;
+    text-align:center;`
+
+const Button = styled.button`
+    color: ${props => props.dark ? 'white' : 'dark'};
+    background: ${props => props.dark ? 'black' : 'white'};
+    border: 1px solid black`
+
+export default function MainPage(){
+    return(
+        <Wrapper>
+            <Title>
+                안녕 리액트
+            </Title>
+            <br />
+            <Button>Normal</Button>&nbsp;&nbsp;&nbsp;
+            <Button dark>Dark</Button>
+        </Wrapper>
+    )
+}
+```
+![alt text](image-2.png)
+
+```jsx 
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+    padding: 1em;
+    background: gray`
+
+const Title = styled.h1`
+    font-size: 1.5em;
+    color: white;
+    text-align:center;`
+
+const Button = styled.button`
+    color: ${props => props.dark ? 'white' : 'dark'};
+    background: ${props => props.dark ? 'black' : 'white'};
+    border: 1px solid black`
+
+
+const RoundButton = styled(Button)`
+border-radius: 16px`
+
+export default function MainPage(){
+    return(
+        <Wrapper>
+            <Title>
+                안녕 리액트
+            </Title>
+            <br />
+            <Button>Normal</Button>&nbsp;&nbsp;&nbsp;
+            <Button dark>Dark</Button>
+            <br />
+            <RoundButton>Round Button</RoundButton>
+        </Wrapper>
+    )
+}
+```
+
+![alt text](image-3.png)
 # 6월 11일
 ### Containment와 specialzation을 같이 사용하기
 - Containment를 위해서 props.children을 사용하고 , specialzation을 위해 직접 정의한 props를 사용하면 된다.
